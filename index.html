@@ -4,12 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Smart Industrial Dashboard</title>
-  <link rel="stylesheet" href="style/style.css" />
+<link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
-  <h1>Welcome to Smart Industrial Dashboard</h1>
-  <p>This is the starting point of the project.</p>
+  <header>
+    <h1>Smart Industrial Dashboard</h1>
+  </header>
 
-  <script src="script/script.js"></script>
+  <main>
+    <section class="chart-section">
+      <h2>Live Data Visualization</h2>
+      <div class="chart-placeholder">
+  <canvas id="myChart" width="400" height="200"></canvas>
+</div>
+
+    </section>
+
+    <section class="alerts-section">
+      <h2>System Alerts</h2>
+      <ul id="alerts">
+        <li>No active alerts.</li>
+      </ul>
+      <button onclick="addAlert()">Simulate Alarm H400</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Mohammad Choopani</p>
+  </footer>
+
+  <script src="script.js"></script>
+
 </body>
 </html>
+

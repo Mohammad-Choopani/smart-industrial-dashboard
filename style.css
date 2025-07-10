@@ -1,6 +1,68 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* General */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f7f8;
   color: #333;
+  padding: 20px;
+}
+
+/* Header */
+header {
+  background-color: #003366;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+/* Main Sections */
+main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+/* Chart Section */
+.chart-section, .alerts-section {
+  flex: 1 1 45%;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.chart-placeholder {
+  background: #e0e0e0;
+  height: 200px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+/* Alerts Section */
+.alerts-section ul {
+  list-style-type: disc;
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+/* Footer */
+footer {
+  margin-top: 40px;
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
 }
