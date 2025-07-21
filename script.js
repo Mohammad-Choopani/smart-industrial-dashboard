@@ -57,19 +57,34 @@ function checkForAlerts(value) {
   }
 }
 
+let t = 0;
+
+function simulateNeuralSignal() {
+  const frequency = 0.2; // how fast signal changes
+  const amplitude = 30;  // base range
+  const noise = 10;      // randomness intensity
+
+  const signal = Math.sin(t * frequency) * amplitude + (Math.random() * noise - noise / 2) + 50;
+
+  t++;
+
+  return Math.round(signal);
+}
+
+
 function updateChartData() {
-  const newValue = Math.floor(Math.random() * 50) + 1;
+  const newValue = simulateNeuralSignal();
 
   chart.data.datasets[0].data.shift();
   chart.data.datasets[0].data.push(newValue);
 
   chart.data.labels.shift();
-  chart.data.labels.push(new Date().toLocaleTimeString());
+  chart.data.labels.push(new Date().toLocaleTimeString("en-US", { hour12: false }));
 
   chart.update();
 
-  checkForAlerts(newValue);
+  checkForAlerts?.(newValue);
 }
 
 // شروع آپدیت داده هر 3 ثانیه
-setInterval(updateChartData, 3000);
+setInterval(updateChartData, 300);
