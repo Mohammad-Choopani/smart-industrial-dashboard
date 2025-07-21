@@ -9,6 +9,27 @@ const DATA_POINTS     = 30;
 const sensors = [];
 let time = 0;
 
+// ==== VOICE SETUP ====
+// we'll cache voices as soon as they’re available
+let voices = [];
+function loadVoices() {
+  voices = speechSynthesis.getVoices();
+}
+// initial load (may be empty), then listen for changes
+loadVoices();
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function speakError(msg) {
+  const utter = new SpeechSynthesisUtterance(msg);
+  // pick a US English voice if possible
+  utter.voice = voices.find(v => v.lang === 'en-US') || voices[0];
+  utter.rate  = 1.0;
+  utter.pitch = 1.0;
+  speechSynthesis.speak(utter);
+}
+
 // ==== UTILITIES ====
 // Simulate temp with occasional spike
 function simulateTemp(base = 65) {
@@ -31,14 +52,7 @@ function getInitialLabels() {
   );
 }
 
-// Text‑to‑speech
-function speakError(msg) {
-  const u = new SpeechSynthesisUtterance(msg);
-  u.rate = 1.0;
-  speechSynthesis.speak(u);
-}
-
-// Add alert to list
+// ==== ALERT HELPERS ====
 function pushAlert(text) {
   const list = document.getElementById('alerts');
   if (list.children.length === 1 && list.children[0].textContent === 'No active alerts.') {
@@ -48,21 +62,20 @@ function pushAlert(text) {
   li.textContent = text;
   li.style.color = 'red';
   list.appendChild(li);
+  speakError(text);
 }
 
 // Manual alert button
 function addAlert() {
-  const msg = 'Error: Emergency Stop Triggered (H400)';
+  const msg = 'Error: Emergency Stop Triggered H400';
   pushAlert(`🚨 ${msg}`);
-  speakError(msg);
 }
 
 // Auto‑alerts on chart updates
 function checkForAlerts(value, idx) {
   if (value > ALERT_THRESHOLD) {
-    const msg = `Error: Sensor ${idx+1} overheated at ${value}°C`;
+    const msg = `Error: Sensor ${idx+1} overheated at ${value} degrees`;
     pushAlert(`🚨 ${msg}`);
-    speakError(msg);
   }
 }
 
@@ -74,7 +87,7 @@ for (let i = 0; i < NUM_SENSORS; i++) {
     data: {
       labels: getInitialLabels(),
       datasets: [{ 
-        label: `Sensor 0${i+1}`, 
+        label: `Sensor ${i+1}`, 
         data: getInitialData(), 
         backgroundColor: 'rgba(0,102,204,0.1)',
         borderColor: 'rgba(0,102,204,1)',
@@ -93,14 +106,14 @@ for (let i = 0; i < NUM_SENSORS; i++) {
 // ==== ANALYTICS ====
 function updateAnalytics() {
   const all = sensors.flatMap(c => c.data.datasets[0].data);
-  const n = all.length;
+  const n    = all.length;
   const over = all.filter(v=>v>ALERT_THRESHOLD).length;
-  const sum = all.reduce((a,b)=>a+b,0), avg = sum/n;
+  const sum  = all.reduce((a,b)=>a+b,0), avg = sum/n;
   const sorted = [...all].sort((a,b)=>a-b);
-  const mid = Math.floor(n/2);
-  const med = n%2 ? sorted[mid] : (sorted[mid-1]+sorted[mid])/2;
-  const varr = all.reduce((a,b)=>a+(b-avg)**2,0)/n;
-  const sd = Math.sqrt(varr);
+  const mid    = Math.floor(n/2);
+  const med    = n%2 ? sorted[mid] : (sorted[mid-1]+sorted[mid])/2;
+  const varr   = all.reduce((a,b)=>a+(b-avg)**2,0)/n;
+  const sd     = Math.sqrt(varr);
 
   document.getElementById('metric-total-readings').textContent  = n;
   document.getElementById('metric-total-overheats').textContent = over;
@@ -116,30 +129,20 @@ function updateAnalytics() {
 
 // ==== SIMULATION FUNCTIONS ====
 function simulateTotalOverheat() {
-  const msg = 'Critical Error: Total system overheat!';
-  pushAlert(`🚨 ${msg}`);
-  speakError(msg);
+  pushAlert('Critical Error: Total system overheat');
 }
 function simulateElectricityError() {
-  const msg = 'Critical Error: Electricity outage detected!';
-  pushAlert(`🚨 ${msg}`);
-  speakError(msg);
+  pushAlert('Critical Error: Electricity outage detected');
 }
 function simulateMachineBroken() {
-  const msg = 'Critical Error: Machine malfunction – broken!';
-  pushAlert(`🚨 ${msg}`);
-  speakError(msg);
+  pushAlert('Critical Error: Machine malfunction - broken');
 }
 function simulateCoolingFailure() {
-  const msg = 'Critical Error: Cooling system failure!';
-  pushAlert(`🚨 ${msg}`);
-  speakError(msg);
+  pushAlert('Critical Error: Cooling system failure');
 }
 function simulateSensorFault() {
-  const idx = Math.floor(Math.random()*NUM_SENSORS)+1;
-  const msg = `Sensor ${idx} fault – no data received`;
-  pushAlert(`🚨 ${msg}`);
-  speakError(msg);
+  const idx = Math.floor(Math.random()*NUM_SENSORS) + 1;
+  pushAlert(`Sensor ${idx} fault - no data received`);
 }
 
 // ==== UPDATE LOOP ====
