@@ -173,4 +173,4 @@ function updateAllCharts() {
   updateAnalytics();
 }
 
-setInterval(updateAllCharts, 30);
+setInterval(updateAllCharts, 300);
