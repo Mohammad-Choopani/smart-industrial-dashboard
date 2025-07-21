@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Smart Industrial Dashboard</title>
-<link rel="stylesheet" href="style.css" />
+  
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </head>
 <body>
   <header>
@@ -16,10 +16,13 @@
   <main>
     <section class="chart-section">
       <h2>Live Data Visualization</h2>
-      <div class="chart-placeholder">
-  <canvas id="myChart" width="400" height="200"></canvas>
-</div>
-
+      <div class="chart-grid">
+        <canvas id="chart1"></canvas>
+        <canvas id="chart2"></canvas>
+        <canvas id="chart3"></canvas>
+        <canvas id="chart4"></canvas>
+        <canvas id="chart5"></canvas>
+      </div>
     </section>
 
     <section class="alerts-section">
@@ -36,7 +39,5 @@
   </footer>
 
   <script src="script.js"></script>
-
 </body>
 </html>
-
