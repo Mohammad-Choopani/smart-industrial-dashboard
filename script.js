@@ -238,4 +238,4 @@ function updateAll() {
 }
 
 renderDB();
-updateInterval = setInterval(updateAll, 3000);
+updateInterval = setInterval(updateAll, 90);
