@@ -36,10 +36,10 @@ footer {
   font-size: 0.9rem;
 }
 
-/* Chart & Alerts Section Containers */
+/* Section Containers */
 .chart-section,
-.alerts-section,
-.analytics-section {
+.analytics-section,
+.alerts-section {
   flex: 1 1 45%;
   background: #ffffff;
   padding: 20px;
@@ -64,15 +64,10 @@ canvas {
   border-radius: 6px;
 }
 
-/* Analytics Panel */
+/* Analytics Grid */
 .analytics-section {
-  flex: 1 1 100%; /* span full width */
+  flex: 1 1 100%;
   margin-bottom: 20px;
-}
-
-.analytics-section h2 {
-  margin-bottom: 15px;
-  color: #003366;
 }
 
 .analytics-grid {
@@ -111,18 +106,25 @@ canvas {
   margin-bottom: 10px;
 }
 
-/* Button */
-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-weight: bold;
-  background: crimson;
-  color: white;
+/* Simulation Buttons */
+.buttons-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.sim-button {
+  flex: 1 1 calc(33% - 10px);
+  padding: 10px;
+  background: #0073e6;
+  color: #fff;
   border: none;
   border-radius: 4px;
+  font-size: 0.9rem;
   cursor: pointer;
 }
 
-button:hover {
-  background: darkred;
+.sim-button:hover {
+  background: #005bb5;
 }
