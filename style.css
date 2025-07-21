@@ -13,7 +13,6 @@ body {
   padding: 20px;
 }
 
-/* Header */
 header {
   background-color: #003366;
   color: #fff;
@@ -23,7 +22,6 @@ header {
   margin-bottom: 30px;
 }
 
-/* Main Sections */
 main {
   display: flex;
   flex-wrap: wrap;
@@ -31,9 +29,17 @@ main {
   justify-content: space-between;
 }
 
+footer {
+  margin-top: 40px;
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+}
+
 /* Chart & Alerts Section Containers */
 .chart-section,
-.alerts-section {
+.alerts-section,
+.analytics-section {
   flex: 1 1 45%;
   background: #ffffff;
   padding: 20px;
@@ -56,6 +62,42 @@ canvas {
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 6px;
+}
+
+/* Analytics Panel */
+.analytics-section {
+  flex: 1 1 100%; /* span full width */
+  margin-bottom: 20px;
+}
+
+.analytics-section h2 {
+  margin-bottom: 15px;
+  color: #003366;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 20px;
+}
+
+.metric {
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 6px;
+  text-align: center;
+  box-shadow: 0 0 6px rgba(0,0,0,0.05);
+}
+
+.metric p {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.metric h3 {
+  font-size: 1.4rem;
+  color: #003366;
 }
 
 /* Alerts List */
@@ -83,12 +125,4 @@ button {
 
 button:hover {
   background: darkred;
-}
-
-/* Footer */
-footer {
-  margin-top: 40px;
-  text-align: center;
-  color: #888;
-  font-size: 0.9rem;
 }
