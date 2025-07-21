@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Smart Industrial Dashboard</title>
-  
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -37,9 +36,9 @@
         <div class="metric"><p>Max Temperature</p><h3 id="metric-max-temp">0°C</h3></div>
         <div class="metric"><p>Min Temperature</p><h3 id="metric-min-temp">0°C</h3></div>
         <div class="metric"><p>Median Temperature</p><h3 id="metric-median-temp">0°C</h3></div>
-        <div class="metric"><p>Temperature Std Dev</p><h3 id="metric-std-dev">0°C</h3></div>
+        <div class="metric"><p>Temp Std Dev</p><h3 id="metric-std-dev">0°C</h3></div>
         <div class="metric"><p>Sensors Online</p><h3 id="metric-sensors-online">0</h3></div>
-        <div class="metric"><p>Data Points per Sensor</p><h3 id="metric-data-points">0</h3></div>
+        <div class="metric"><p>Data Points</p><h3 id="metric-data-points">0</h3></div>
       </div>
     </section>
 
@@ -57,6 +56,13 @@
         <button class="sim-button" onclick="simulateCoolingFailure()">Cooling Failure</button>
         <button class="sim-button" onclick="simulateSensorFault()">Sensor Fault</button>
       </div>
+    </section>
+
+    <!-- Data History Panel -->
+    <section class="db-section">
+      <h2>Data History</h2>
+      <button class="db-button" onclick="clearDB()">Clear Database</button>
+      <div id="db-panel"></div>
     </section>
   </main>
 
