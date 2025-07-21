@@ -1,14 +1,14 @@
-// ==== SETTINGS ====
+console.log("Dashboard loaded");
+
+// ==== SETTINGS & STATE ====
 const NUM_SENSORS     = 5;
 const ALERT_THRESHOLD = 90;
 const DATA_POINTS     = 30;
-
-// ==== STATE ====
-const sensors = [];
-let time = 0;
+let sensors = [];
+let time    = 0;
+let updateInterval;
 
 // ==== VOICE SETUP ====
-// Cache voices once available
 let voices = [];
 function loadVoices() {
   voices = speechSynthesis.getVoices();
@@ -17,66 +17,102 @@ loadVoices();
 if (speechSynthesis.onvoiceschanged !== undefined) {
   speechSynthesis.onvoiceschanged = loadVoices;
 }
-
-// Speak a plain message (no emojis) in en-US machine voice
 function speakError(msg) {
-  // pick an en-US voice if possible
-  const voice = voices.find(v => v.lang.startsWith('en-US')) || voices[0];
   const utter = new SpeechSynthesisUtterance(msg);
-  utter.voice = voice;
-  utter.rate  = 1.0;
-  utter.pitch = 1.0;
+  utter.voice  = voices.find(v => v.lang.startsWith('en-US')) || voices[0];
+  utter.rate   = 1.0;
+  utter.pitch  = 1.0;
   speechSynthesis.speak(utter);
 }
 
 // ==== ALERT HELPERS ====
 function pushAlert(displayText) {
   const list = document.getElementById('alerts');
-  // clear "No active alerts."
   if (list.children.length === 1 && list.children[0].textContent === 'No active alerts.') {
     list.innerHTML = '';
   }
-  // add to list
   const li = document.createElement('li');
   li.textContent = displayText;
   li.style.color = 'red';
   list.appendChild(li);
-  // strip leading emoji for speech
+  // strip emoji
   const spoken = displayText.replace(/^🚨\s*/, '');
   speakError(spoken);
 }
 
-// ==== MANUAL ALERT ====
+// ==== BUTTON HANDLERS ====
+// Emergency Stop — freeze updates
 function addAlert() {
   pushAlert('🚨 Error: Emergency Stop Triggered H400');
+  clearInterval(updateInterval);
 }
 
-// ==== AUTO ALERT ON OVERHEAT ====
-function checkForAlerts(value, idx) {
-  if (value > ALERT_THRESHOLD) {
-    pushAlert(`🚨 Error: Sensor ${idx+1} overheated at ${value} degrees`);
-  }
-}
-
-// ==== SIMULATION BUTTONS ====
+// Total Overheat — all sensors spike
 function simulateTotalOverheat() {
   pushAlert('🚨 Critical Error: Total system overheat');
-}
-function simulateElectricityError() {
-  pushAlert('🚨 Critical Error: Electricity outage detected');
-}
-function simulateMachineBroken() {
-  pushAlert('🚨 Critical Error: Machine malfunction – broken');
-}
-function simulateCoolingFailure() {
-  pushAlert('🚨 Critical Error: Cooling system failure');
-}
-function simulateSensorFault() {
-  const idx = Math.floor(Math.random() * NUM_SENSORS) + 1;
-  pushAlert(`🚨 Sensor ${idx} fault – no data received`);
+  const label = new Date().toLocaleTimeString("en-US", { hour12: false });
+  sensors.forEach(chart => {
+    chart.data.datasets[0].data.shift();
+    chart.data.datasets[0].data.push(ALERT_THRESHOLD + Math.random() * 10 + 5);
+    chart.data.labels.shift();
+    chart.data.labels.push(label);
+    chart.update();
+  });
 }
 
-// ==== DATA SIMULATION & CHART SETUP ====
+// Electricity Error — all sensors drop to 0
+function simulateElectricityError() {
+  pushAlert('🚨 Critical Error: Electricity outage detected');
+  const label = new Date().toLocaleTimeString("en-US", { hour12: false });
+  sensors.forEach(chart => {
+    chart.data.datasets[0].data.shift();
+    chart.data.datasets[0].data.push(0);
+    chart.data.labels.shift();
+    chart.data.labels.push(label);
+    chart.update();
+  });
+}
+
+// Machine Broken — one random sensor reads null
+function simulateMachineBroken() {
+  const idx = Math.floor(Math.random() * NUM_SENSORS);
+  pushAlert(`🚨 Critical Error: Machine ${idx+1} malfunction – broken`);
+  const label = new Date().toLocaleTimeString("en-US", { hour12: false });
+  const chart = sensors[idx];
+  chart.data.datasets[0].data.shift();
+  chart.data.datasets[0].data.push(null);
+  chart.data.labels.shift();
+  chart.data.labels.push(label);
+  chart.update();
+}
+
+// Cooling Failure — one random sensor overheats hard
+function simulateCoolingFailure() {
+  const idx = Math.floor(Math.random() * NUM_SENSORS);
+  pushAlert(`🚨 Critical Error: Cooling failure on Sensor ${idx+1}`);
+  const label = new Date().toLocaleTimeString("en-US", { hour12: false });
+  const chart = sensors[idx];
+  chart.data.datasets[0].data.shift();
+  chart.data.datasets[0].data.push(ALERT_THRESHOLD + Math.random() * 20 + 10);
+  chart.data.labels.shift();
+  chart.data.labels.push(label);
+  chart.update();
+}
+
+// Sensor Fault — one random sensor gap (null)
+function simulateSensorFault() {
+  const idx = Math.floor(Math.random() * NUM_SENSORS);
+  pushAlert(`🚨 Sensor ${idx+1} fault – no data received`);
+  const label = new Date().toLocaleTimeString("en-US", { hour12: false });
+  const chart = sensors[idx];
+  chart.data.datasets[0].data.shift();
+  chart.data.datasets[0].data.push(null);
+  chart.data.labels.shift();
+  chart.data.labels.push(label);
+  chart.update();
+}
+
+// ==== DATA SIM & CHART SETUP ====
 function simulateTemp(base = 65) {
   const wave  = Math.sin(time * 0.05) * 3;
   const noise = (Math.random() - 0.5) * 2;
@@ -96,7 +132,6 @@ function getInitialLabels() {
   );
 }
 
-// build charts
 for (let i = 0; i < NUM_SENSORS; i++) {
   const ctx = document.getElementById(`chart${i+1}`).getContext('2d');
   const chart = new Chart(ctx, {
@@ -116,16 +151,8 @@ for (let i = 0; i < NUM_SENSORS; i++) {
     options: {
       responsive: true,
       animation: false,
-      scales: {
-        y: {
-          min: 40,
-          max: 120,
-          title: { display: true, text: '°C' }
-        }
-      },
-      plugins: {
-        legend: { display: false }
-      }
+      scales: { y: { min: 40, max: 120, title: { display: true, text: '°C' } } },
+      plugins: { legend: { display: false } }
     }
   });
   sensors.push(chart);
@@ -136,41 +163,42 @@ function updateAnalytics() {
   const all = sensors.flatMap(c => c.data.datasets[0].data);
   const n    = all.length;
   const over = all.filter(v => v > ALERT_THRESHOLD).length;
-  const sum  = all.reduce((a, b) => a + b, 0);
+  const sum  = all.reduce((a, b) => a + (b||0), 0);
   const avg  = sum / n;
-  const sorted = [...all].sort((a, b) => a - b);
-  const mid    = Math.floor(n / 2);
-  const med    = n % 2 ? sorted[mid] : (sorted[mid-1] + sorted[mid]) / 2;
-  const varr   = all.reduce((a, b) => a + (b - avg) ** 2, 0) / n;
+  const sorted = [...all].filter(v=>v!=null).sort((a,b)=>a-b);
+  const mid    = Math.floor(sorted.length / 2);
+  const med    = sorted.length % 2 ? sorted[mid] : (sorted[mid-1] + sorted[mid]) / 2;
+  const varr   = sorted.reduce((a,b)=>a+(b-avg)**2,0)/sorted.length;
   const sd     = Math.sqrt(varr);
 
   document.getElementById('metric-total-readings').textContent  = n;
   document.getElementById('metric-total-overheats').textContent = over;
   document.getElementById('metric-error-rate').textContent      = ((over/n)*100).toFixed(1) + '%';
   document.getElementById('metric-avg-temp').textContent        = avg.toFixed(1) + '°C';
-  document.getElementById('metric-max-temp').textContent        = Math.max(...all).toFixed(1) + '°C';
-  document.getElementById('metric-min-temp').textContent        = Math.min(...all).toFixed(1) + '°C';
+  document.getElementById('metric-max-temp').textContent        = Math.max(...sorted).toFixed(1) + '°C';
+  document.getElementById('metric-min-temp').textContent        = Math.min(...sorted).toFixed(1) + '°C';
   document.getElementById('metric-median-temp').textContent     = med.toFixed(1) + '°C';
   document.getElementById('metric-std-dev').textContent         = sd.toFixed(1) + '°C';
   document.getElementById('metric-sensors-online').textContent  = sensors.length;
   document.getElementById('metric-data-points').textContent     = DATA_POINTS;
 }
 
-// ==== MAIN LOOP ====
+// ==== MAIN UPDATE LOOP ====
 function updateAllCharts() {
   time++;
   sensors.forEach((chart, i) => {
-    const v = simulateTemp(65 + i*2);
+    const v = simulateTemp(65 + i * 2);
     chart.data.datasets[0].data.shift();
     chart.data.datasets[0].data.push(v);
     chart.data.labels.shift();
-    chart.data.labels.push(
-      new Date().toLocaleTimeString("en-US", { hour12: false })
-    );
+    chart.data.labels.push(new Date().toLocaleTimeString("en-US", { hour12: false }));
     chart.update();
-    checkForAlerts(v, i);
+    if (v > ALERT_THRESHOLD) {
+      pushAlert(`🚨 Error: Sensor ${i+1} overheated at ${v} degrees`);
+    }
   });
   updateAnalytics();
 }
 
-setInterval(updateAllCharts, 90);
+// kick it off
+updateInterval = setInterval(updateAllCharts, 90);
