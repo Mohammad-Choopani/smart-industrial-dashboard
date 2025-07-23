@@ -4,9 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Smart Industrial Dashboard</title>
-<link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </head>
 <body>
   <header>
@@ -14,20 +13,57 @@
   </header>
 
   <main>
+    <!-- Live Charts -->
     <section class="chart-section">
       <h2>Live Data Visualization</h2>
-      <div class="chart-placeholder">
-  <canvas id="myChart" width="400" height="200"></canvas>
-</div>
-
+      <div class="chart-grid">
+        <canvas id="chart1"></canvas>
+        <canvas id="chart2"></canvas>
+        <canvas id="chart3"></canvas>
+        <canvas id="chart4"></canvas>
+        <canvas id="chart5"></canvas>
+      </div>
     </section>
 
+    <!-- Analytics Panel -->
+    <section class="analytics-section">
+      <h2>System Analytics</h2>
+      <div class="analytics-grid">
+        <div class="metric"><p>Total Readings</p><h3 id="metric-total-readings">0</h3></div>
+        <div class="metric"><p>Total Overheats</p><h3 id="metric-total-overheats">0</h3></div>
+        <div class="metric"><p>Error Rate</p><h3 id="metric-error-rate">0%</h3></div>
+        <div class="metric"><p>Avg Temperature</p><h3 id="metric-avg-temp">0°C</h3></div>
+        <div class="metric"><p>Max Temperature</p><h3 id="metric-max-temp">0°C</h3></div>
+        <div class="metric"><p>Min Temperature</p><h3 id="metric-min-temp">0°C</h3></div>
+        <div class="metric"><p>Median Temperature</p><h3 id="metric-median-temp">0°C</h3></div>
+        <div class="metric"><p>Temp Std Dev</p><h3 id="metric-std-dev">0°C</h3></div>
+        <div class="metric"><p>Sensors Online</p><h3 id="metric-sensors-online">0</h3></div>
+        <div class="metric"><p>Data Points</p><h3 id="metric-data-points">0</h3></div>
+      </div>
+    </section>
+
+    <!-- Alerts & Simulation Buttons -->
     <section class="alerts-section">
       <h2>System Alerts</h2>
       <ul id="alerts">
         <li>No active alerts.</li>
       </ul>
-      <button onclick="addAlert()">Simulate Alarm H400</button>
+      <div class="buttons-grid">
+        <button class="sim-button" onclick="addAlert()">Emergency Stop (H400)</button>
+        <button class="sim-button" onclick="simulateTotalOverheat()">Total Overheat</button>
+        <button class="sim-button" onclick="simulateElectricityError()">Electricity Error</button>
+        <button class="sim-button" onclick="simulateMachineBroken()">Machine Broken</button>
+        <button class="sim-button" onclick="simulateCoolingFailure()">Cooling Failure</button>
+        <button class="sim-button" onclick="simulateSensorFault()">Sensor Fault</button>
+      </div>
+    </section>
+
+    <!-- Data History Panel -->
+    <section class="db-section">
+      <h2>Analytics History</h2>
+      <!-- this button stays ABOVE the scrollable log -->
+      <button class="db-button" onclick="clearDB()">Clear Database</button>
+      <div id="db-panel"></div>
     </section>
   </main>
 
@@ -36,7 +72,5 @@
   </footer>
 
   <script src="script.js"></script>
-
 </body>
 </html>
-
